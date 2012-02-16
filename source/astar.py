@@ -84,19 +84,16 @@ def reconstructPath(G, start, end):
     """Reconstruct the path from the end node to the start."""
 
     current = end
-    path = [str(end)]
+    path = [end]
 
-    while str(current) != start:
+    while current != None:
         path.insert(0, current.attr['parent'])
         current = G.get_node(current.attr['parent'])
+        if current == start:
+            return path
 
-    return path
-
-def minFScore(nodes):
-    """Get the node with the minimum F score."""
-
-    g = lambda u: float(u.attr['f'])
-    return min(nodes, key=g)
+    # Couldn't find start, this is an error
+    return None
 
 def aStar(G, start, end, exclude=None):
     """A* algorithm implementation for graphs."""
@@ -114,7 +111,8 @@ def aStar(G, start, end, exclude=None):
     s.attr['h'] = heuristicCostEstimate(s, e)
 
     while len(openSet) != 0:
-        u = minFScore(openSet)
+        # Get minimum 'f' value
+        u = min(openSet, key=lambda u: float(u.attr['f']))
         if u == end:
             return reconstructPath(G, s, e)
 
