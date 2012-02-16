@@ -29,16 +29,21 @@ class Graph(pgv.AGraph):
         lines = f.readlines()
         f.close()
         
+        # Iterate through each line except last (END marker)
+        assert(lines[-1] == 'END')
         for line in lines[:-1]:
             try:
-                (name, xPos, yPos) = line.split()
+                (name, yPos, xPos) = line.split()
             except ValueError, e:
                 print e
                 if line != 'END':
                     print "Invalid input -> %s" % line
                     sys.exit(1)
 
-            self.add_node(name, xPos=xPos, yPos=yPos, h=0, g=0, f=0, parent=None)
+            pos = "%s, %s" % (xPos, yPos)
+
+            # Note: all node attributes are stored as strings
+            self.add_node(name, pos=pos, h=0, g=0, f=0, parent=None)
 
     def parseConnections(self, filename):
         """Parse a connections file."""
@@ -47,6 +52,8 @@ class Graph(pgv.AGraph):
         lines = f.readlines()
         f.close()
 
+        # Iterate through each line except last (END marker)
+        assert(lines[-1] == 'END')
         for line in lines[:-1]:
             tokens = line.split()
             uName = tokens[0]
@@ -54,15 +61,19 @@ class Graph(pgv.AGraph):
             neighbors = tokens[2:]
             assert nNeighbors == len(neighbors)
             for vName in neighbors:
-                self.add_edge(uName, vName)
+                u = self.get_node(uName)
+                v = self.get_node(vName)
+                self.add_edge(uName, vName, label="%4.2f" % dist(u, v))
                 
 def dist(u, v):
-    """Get distance between nodes u and v."""
+    """Get straight line distance between nodes u and v."""
     
-    dX = abs(float(u.attr['xPos']) - float(v.attr['xPos']))
-    dY = abs(float(u.attr['yPos']) - float(v.attr['yPos']))
+    (uX, uY) = [float(num) for num in u.attr['pos'].split(", ")]
+    (vX, vY) = [float(num) for num in v.attr['pos'].split(", ")]
+    dX = abs(uX - vX)
+    dY = abs(uY - vY)
 
-    return sqrt(pow(dX, 2) + pow(dY, 2))
+    return float(sqrt(pow(dX, 2) + pow(dY, 2)))
 
 def heuristicCostEstimate(u, v):
     """Get heuristic cost estimate from node u to node v."""
@@ -92,8 +103,11 @@ def aStar(G, start, end, exclude=None):
 
     s = G.get_node(start)
     e = G.get_node(end)
+    x = None
+    if exclude:
+        x = G.get_node(exclude)
 
-    closedSet = []
+    closedSet = [x]
     openSet = [s]
 
     s.attr['g'] = 0
@@ -118,7 +132,7 @@ def aStar(G, start, end, exclude=None):
                 v.attr['h'] = heuristicCostEstimate(v, e)
                 tmpGIsBetter = True
 
-            elif tmpG < v.attr['g']:
+            elif tmpG < float(v.attr['g']):
                 tmpGIsBetter = True
 
             else:
@@ -165,13 +179,7 @@ if __name__ == '__main__':
     g.parseConnections(options.conFile)
 
     # Get shortest path using A* algorithm
-    path = aStar(g, start, end)
-
-    # Display graph
-    g.layout(prog='dot')
-    g.draw('graph.png')
-
-    # Write 'dot' file
-    g.write('graph.dot')
+    path = aStar(g, start, end, exclude)
+    print "Shortest path: " + "->".join(path)
 
 

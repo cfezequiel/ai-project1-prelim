@@ -1,4 +1,0 @@
-A 2 B D
-B 2 A C
-C 2 B D
-D 2 A C

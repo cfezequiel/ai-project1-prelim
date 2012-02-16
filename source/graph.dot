@@ -1,6 +1,0 @@
-strict graph {
-	A -- D;
-	A -- B;
-	B -- C;
-	C -- D;
-}
