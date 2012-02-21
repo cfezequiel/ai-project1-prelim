@@ -1,5 +1,47 @@
-TODO
+=====================================
 
-Hello from laptop!
+CAP 5625 Intro to AI
+Preliminary Project - AStar Algorithm
 
-Hello from desktop!
+Author:
+    Carlos Ezequiel
+
+=====================================
+
+Notes:
+- The program was written in Python 2.7
+- Thee program was tested on the following machines:
+    * Ubuntu 11.10
+    * Mac OSX Lion
+
+Execution instructions:
+
+1. Run the program itself.
+
+    $ python astar.py <start city> <end city> [excluded city]
+
+    The location and connection data is, by default, in the /input
+    directory. The default location and connection files are:
+        connections.txt
+        locations.txt
+
+    A different file for location and connection data can be specified
+    by using the -l and -c options respectively.
+
+    For help, execute the following:
+
+    $ ./astar.py -h
+    OR
+    $ ./astar.py --help
+
+2. Run the test.
+
+    $ python test_astar.py
+
+    Current, the test has just 3 test cases, where one test case
+    checks the output when an excluded city is given in the program
+    input.
+
+    The output should be 'OK' on all tests.
+
+
