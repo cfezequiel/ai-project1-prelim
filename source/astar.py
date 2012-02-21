@@ -14,13 +14,51 @@ import sys
 from math import sqrt
 from optparse import OptionParser
 
-import networkx as nx
-import pygraphviz as pgv
 
 INPUT_DIR='../input'
 
+class Node:
 
-class Graph(pgv.AGraph):
+    def __init__(self, name, attr={}):
+        self.attr = {'name': name}
+        self.attr.update(attr)
+
+    def __repr__(self):
+        return self.attr['name']
+    
+    def __str__(self):
+        return self.attr['name']
+
+class Graph:
+
+    def __init__(self):
+        self.nodes = {}
+        self.edges = {}
+
+    def add_edge(self, u, v, label=None):
+        uNode = self.get_node(u)
+        vNode = self.get_node(v)
+        try:
+            self.edges[uNode].append(vNode)
+        except KeyError:
+            self.edges[uNode] = [vNode]
+
+        try:
+            self.edges[vNode].append(uNode)
+        except KeyError:
+            self.edges[vNode] = [uNode]
+
+    def add_node(self, u, *args, **attr):
+        self.nodes[u] = Node(u, attr)
+
+    def neighbors(self, u):
+        return self.edges[u]
+        
+    def get_node(self, u):
+        try:
+            return self.nodes[u]
+        except KeyError:
+            return None
 
     def parseLocations(self, filename):
         """Parse a locations file."""
@@ -80,16 +118,16 @@ def heuristicCostEstimate(u, v):
 
     return dist(u, v)
 
-def reconstructPath(G, start, end):
+def reconstructPath(G, s, e):
     """Reconstruct the path from the end node to the start."""
 
-    current = end
-    path = [end]
+    u = e
+    path = [str(e)]
 
-    while current != None:
-        path.insert(0, current.attr['parent'])
-        current = G.get_node(current.attr['parent'])
-        if current == start:
+    while u != None:
+        u = G.get_node(str(u.attr['parent']))
+        path.insert(0, str(u))
+        if u == s:
             return path
 
     # Couldn't find start, this is an error
@@ -113,7 +151,7 @@ def aStar(G, start, end, exclude=None):
     while len(openSet) != 0:
         # Get minimum 'f' value
         u = min(openSet, key=lambda u: float(u.attr['f']))
-        if u == end:
+        if u == e:
             return reconstructPath(G, s, e)
 
         openSet.remove(u)
@@ -178,6 +216,7 @@ if __name__ == '__main__':
 
     # Get shortest path using A* algorithm
     path = aStar(g, start, end, exclude)
+    print path
     print "Shortest path: " + "->".join(path)
 
 
