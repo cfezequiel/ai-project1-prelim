@@ -216,7 +216,6 @@ if __name__ == '__main__':
 
     # Get shortest path using A* algorithm
     path = aStar(g, start, end, exclude)
-    print path
-    print "Shortest path: " + "->".join(path)
+    print "->".join(path)
 
 
