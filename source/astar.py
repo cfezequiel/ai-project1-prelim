@@ -96,10 +96,8 @@ class Graph:
                     print "Invalid input -> %s" % line
                     sys.exit(1)
 
-            pos = "%s, %s" % (xPos, yPos)
-
             # Note: all node attributes are stored as strings
-            self.add_node(name, pos=pos, h=0, g=0, f=0, parent=None)
+            self.add_node(name, pos=(float(xPos), float(yPos)), h=0, g=0, f=0, parent=None)
 
     def parse_connections(self, filename):
         """Parse a connections file."""
@@ -124,12 +122,12 @@ class Graph:
 def dist(u, v):
     """Get straight line distance between nodes u and v."""
     
-    (uX, uY) = [float(num) for num in u.attr['pos'].split(", ")]
-    (vX, vY) = [float(num) for num in v.attr['pos'].split(", ")]
+    (uX, uY) = u.attr['pos']
+    (vX, vY) = v.attr['pos']
     dX = abs(uX - vX)
     dY = abs(uY - vY)
 
-    return float(sqrt(pow(dX, 2) + pow(dY, 2)))
+    return sqrt(pow(dX, 2) + pow(dY, 2))
 
 def heuristic_cost_estimate(u, v):
     """Get heuristic cost estimate from node u to node v."""
@@ -168,7 +166,7 @@ def a_star(G, start, end, exclude=None):
 
     while len(openSet) != 0:
         # Get minimum 'f' value
-        u = min(openSet, key=lambda u: float(u.attr['f']))
+        u = min(openSet, key=lambda u: u.attr['f'])
         if u == e:
             return reconstruct_path(G, s, e)
 
@@ -179,14 +177,14 @@ def a_star(G, start, end, exclude=None):
             if v in closedSet:
                 continue
 
-            tmpG = float(u.attr['g']) + dist(u, v)
+            tmpG = u.attr['g'] + dist(u, v)
 
             if v not in openSet:
                 openSet.append(v)
                 v.attr['h'] = heuristic_cost_estimate(v, e)
                 tmpGIsBetter = True
 
-            elif tmpG < float(v.attr['g']):
+            elif tmpG < v.attr['g']:
                 tmpGIsBetter = True
 
             else:
@@ -195,7 +193,7 @@ def a_star(G, start, end, exclude=None):
             if tmpGIsBetter:
                 v.attr['parent'] = u
                 v.attr['g']= tmpG
-                v.attr['f'] = tmpG + float(v.attr['h'])
+                v.attr['f'] = tmpG + v.attr['h']
 
     return None
                 
