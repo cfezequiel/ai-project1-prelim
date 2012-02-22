@@ -20,24 +20,36 @@ INPUT_DIR='../input'
 class Node:
 
     def __init__(self, name, attr={}):
+        """Constructor."""
+
         self.attr = {'name': name}
         self.attr.update(attr)
 
     def __repr__(self):
+        """Class representation."""
+
         return self.attr['name']
     
     def __str__(self):
+        """String representation."""
+
         return self.attr['name']
 
 class Graph:
+    """Undirected graph."""
 
     def __init__(self):
+        """Initialize nodes list and edges list to empty."""
+
         self.nodes = {}
         self.edges = {}
 
     def add_edge(self, u, v, label=None):
+        """Add an edge bidirectionally."""
+
         uNode = self.get_node(u)
         vNode = self.get_node(v)
+
         try:
             self.edges[uNode].append(vNode)
         except KeyError:
@@ -49,18 +61,24 @@ class Graph:
             self.edges[vNode] = [uNode]
 
     def add_node(self, u, *args, **attr):
+        """Add a node."""
+
         self.nodes[u] = Node(u, attr)
 
     def neighbors(self, u):
+        """Returns a list of neighbors of a given node."""
+
         return self.edges[u]
         
     def get_node(self, u):
+        """Get node from graph given its name."""
+
         try:
             return self.nodes[u]
         except KeyError:
             return None
 
-    def parseLocations(self, filename):
+    def parse_locations(self, filename):
         """Parse a locations file."""
 
         f = open(filename, "r")
@@ -83,7 +101,7 @@ class Graph:
             # Note: all node attributes are stored as strings
             self.add_node(name, pos=pos, h=0, g=0, f=0, parent=None)
 
-    def parseConnections(self, filename):
+    def parse_connections(self, filename):
         """Parse a connections file."""
 
         f = open(filename, "r")
@@ -113,12 +131,12 @@ def dist(u, v):
 
     return float(sqrt(pow(dX, 2) + pow(dY, 2)))
 
-def heuristicCostEstimate(u, v):
+def heuristic_cost_estimate(u, v):
     """Get heuristic cost estimate from node u to node v."""
 
     return dist(u, v)
 
-def reconstructPath(G, s, e):
+def reconstruct_path(G, s, e):
     """Reconstruct the path from the end node to the start."""
 
     u = e
@@ -133,7 +151,7 @@ def reconstructPath(G, s, e):
     # Couldn't find start, this is an error
     return None
 
-def aStar(G, start, end, exclude=None):
+def a_star(G, start, end, exclude=None):
     """A* algorithm implementation for graphs."""
 
     s = G.get_node(start)
@@ -146,13 +164,13 @@ def aStar(G, start, end, exclude=None):
     openSet = [s]
 
     s.attr['g'] = 0
-    s.attr['h'] = heuristicCostEstimate(s, e)
+    s.attr['h'] = heuristic_cost_estimate(s, e)
 
     while len(openSet) != 0:
         # Get minimum 'f' value
         u = min(openSet, key=lambda u: float(u.attr['f']))
         if u == e:
-            return reconstructPath(G, s, e)
+            return reconstruct_path(G, s, e)
 
         openSet.remove(u)
         closedSet.append(u)
@@ -165,7 +183,7 @@ def aStar(G, start, end, exclude=None):
 
             if v not in openSet:
                 openSet.append(v)
-                v.attr['h'] = heuristicCostEstimate(v, e)
+                v.attr['h'] = heuristic_cost_estimate(v, e)
                 tmpGIsBetter = True
 
             elif tmpG < float(v.attr['g']):
@@ -211,11 +229,11 @@ if __name__ == '__main__':
 
     # Parse files
     g = Graph()
-    g.parseLocations(options.locFile)
-    g.parseConnections(options.conFile)
+    g.parse_locations(options.locFile)
+    g.parse_connections(options.conFile)
 
     # Get shortest path using A* algorithm
-    path = aStar(g, start, end, exclude)
+    path = a_star(g, start, end, exclude)
     print "->".join(path)
 
 
