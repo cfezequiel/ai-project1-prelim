@@ -3,6 +3,8 @@
 CAP 5625 Intro to AI
 Preliminary Project - AStar Algorithm
 
+2012-02-22
+
 Author:
     Carlos Ezequiel
 
@@ -43,5 +45,7 @@ Execution instructions:
     input.
 
     The output should be 'OK' on all tests.
+
+    Add more tests as necessary.
 
 
