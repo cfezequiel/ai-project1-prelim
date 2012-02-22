@@ -154,6 +154,8 @@ def a_star(G, start, end, exclude=None):
 
     s = G.get_node(start)
     e = G.get_node(end)
+
+    # Get excluded node if given
     x = None
     if exclude:
         x = G.get_node(exclude)
@@ -161,18 +163,23 @@ def a_star(G, start, end, exclude=None):
     closedSet = [x]
     openSet = [s]
 
+    # Set initial 'g' and 'h' values for start node
     s.attr['g'] = 0
     s.attr['h'] = heuristic_cost_estimate(s, e)
 
     while len(openSet) != 0:
         # Get minimum 'f' value
         u = min(openSet, key=lambda u: u.attr['f'])
+
+        # If end node is reached, return reconstructed path
         if u == e:
             return reconstruct_path(G, s, e)
 
         openSet.remove(u)
         closedSet.append(u)
 
+        # Update all h,g and f values for all neighbors of u not in
+        # closed set
         for v in G.neighbors(u):
             if v in closedSet:
                 continue
@@ -203,7 +210,7 @@ if __name__ == '__main__':
     defaultLocFile = INPUT_DIR + "/locations.txt"
     defaultConFile = INPUT_DIR + "/connections.txt"
 
-    # Parse arguments
+    # Parse input arguments
     usage = "usage: %prog [options] <start city> <end city> " +\
             "[city to exclude from path]"
     parser = OptionParser(usage=usage)
@@ -214,7 +221,7 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
 
-    exclude = ""
+    exclude = None
     nArgs = len(args)
     if nArgs < 2:
         parser.error("Invalid number of arguments.")
