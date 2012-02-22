@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# Unit test for astar algorithm
+"""Unit test for astar algorithm. """
 
 import commands
 import unittest
